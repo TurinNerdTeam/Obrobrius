@@ -1,6 +1,11 @@
 # Obrobrius
 
+![oroboros](./img/oroboros.png)
+
+
 ## Theme
+
+
 
 ## Key features
 
