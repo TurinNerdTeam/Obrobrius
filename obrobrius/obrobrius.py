@@ -3,46 +3,42 @@
 #
 
 import pygame
-from pygame import QUIT
-from obry.obry  import Obry
+from pygame.locals import (
+    K_ESCAPE,
+    KEYDOWN,
+    QUIT,
+)
+from obry.obry import Obry
+
 
 # define global values
-continue_to_play = True
+running = True
 FPS = 60
-FramePerSec = pygame.time.Clock()
+frames_per_second_monitor = pygame.time.Clock()
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
 
-X = 600
-Y = 600
-
-DISPLAYSURF = pygame.display.set_mode((X,Y))
+DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 obry = Obry(DISPLAYSURF)
 
 def events_handler():
     for event in pygame.event.get():
+        global running
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                running = False
         if event.type == QUIT:
-            global continue_to_play
-            continue_to_play = False
+            running = False
 
 def keyboard_handler():
     pressed_keys = pygame.key.get_pressed()
-
-    if pressed_keys[pygame.K_UP]: # move obry up
-        obry.move(0,-5)
-    if pressed_keys[pygame.K_DOWN]: # move obry down
-        obry.move(0,5)
-    if pressed_keys[pygame.K_LEFT]: # move obry left
-        obry.move(-5,0)
-    if pressed_keys[pygame.K_RIGHT]: # move obry right
-        obry.move(5,0)
-    if pressed_keys[pygame.K_q]: # move obry right
-        global continue_to_play
-        continue_to_play = False
+    obry.update_position(pressed_keys)
 
 def main_loop():
-    global continue_to_play
+    global running
     # main loop game
-    while continue_to_play:
+    while running:
         # mange input events
         events_handler()
         keyboard_handler()
@@ -54,7 +50,7 @@ def main_loop():
         # update the main window content
         pygame.display.update()
         # tick
-        FramePerSec.tick(FPS)
+        frames_per_second_monitor.tick(FPS)
 
     # close pygame
     pygame.quit()
@@ -62,6 +58,5 @@ def main_loop():
 if __name__ == "__main__":
     # init paygame
     pygame.init()
-
     # run main loop
     main_loop()
