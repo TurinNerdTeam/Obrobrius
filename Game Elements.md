@@ -2,7 +2,7 @@
 
 ### _Energy Level Bar (or Fatigue bar)_
 
-![oroboros](./img/Energy_Bar_Example.png)
+![oroboros](./img/Energy_Bar_Example1.png)
 
 This bar relates to the Pocket Gopher energy, it decreases whenever Brave expends energy to move objects in the game and can be recovered in three ways:
 * Resting stationary in the path; (slow recovery);
