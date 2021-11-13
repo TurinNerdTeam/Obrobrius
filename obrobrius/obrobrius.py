@@ -8,7 +8,8 @@ from pygame.locals import (
     KEYDOWN,
     QUIT,
 )
-    from sprites.obry import Obry
+
+from sprites.obry import Obry
 
 
 # define global values
