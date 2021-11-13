@@ -1,4 +1,10 @@
+# 
+#
+
 import pygame
+from pygame import Color
+from pygame.sprite import Sprite
+
 from pygame.locals import (
     K_UP,
     K_DOWN,
@@ -6,10 +12,10 @@ from pygame.locals import (
     K_RIGHT,
 )
 
-class Obry():
+class Obry(Sprite):
     def __init__(self, surface):
         super().__init__()
-        self.color = pygame.Color(255,255,255); # White
+        self.color = Color(255,255,255); # White
         self.surface = surface
         self.radius = 5
         self.width = 5
@@ -40,10 +46,8 @@ class Obry():
         if pressed_keys[K_LEFT]:
             self.move(-5,0)
         if pressed_keys[K_RIGHT]:
-            self.move(5,0)            
+            self.move(5,0)
 
     def draw(self):
         pygame.draw.circle(self.surface, self.color, (self.x,self.y), self.radius, self.width)
-
-
 
