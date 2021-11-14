@@ -3,6 +3,7 @@
 import random
 import pygame
 from pygame.sprite import Sprite
+from pygame.sprite import Group as SpriteGroup
 from pygame import Color
 from pygame.surface import Surface
 from pygame.draw import line as Line
@@ -13,8 +14,8 @@ from pygame.draw import line as Line
 N, S, W, E = ('n', 's', 'w', 'e')
 
 # size of the cell
-CELL_WIDTH = 6
-CELL_HEIGHT = 6
+CELL_WIDTH = 60
+CELL_HEIGHT = 60
 
 # default colors
 CELL_BORDER_COLOR = Color(188,188,188) # Gray
@@ -130,3 +131,107 @@ class Cell(Sprite):
             line = Line(self.surface,self.border_color, sw, nw, self.line_width)
             self.rects.append(line)
 
+class Maze(SpriteGroup):
+    """
+    Maze class containing full board and maze generation algorithms.
+    """
+
+    def __init__(self, surface:Surface, width:int=20, height:int=10):
+        """
+        Creates a new maze with the given sizes, with all walls standing.
+        """
+        self.width = width
+        self.height = height
+        self.cells = []
+        for y in range(int(CELL_HEIGHT/2), int(self.height), int(CELL_HEIGHT/2)):
+            for x in range(int(CELL_WIDTH/2), int(self.width), int(CELL_WIDTH/2)):
+                self.cells.append(Cell(surface, x, y))
+
+    def __getitem__(self, index):
+        """
+        Returns the cell at index = (x, y).
+        """
+        x, y = index
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return self.cells[x + y * self.width]
+        else:
+            return None
+
+    def neighbors(self, cell):
+        """
+        Returns the list of neighboring cells, not counting diagonals. Cells on
+        borders or corners may have less than 4 neighbors.
+        """
+        x = cell.x
+        y = cell.y
+        for new_x, new_y in [(x, y - int(CELL_HEIGHT/2)), (x, y + int(CELL_HEIGHT/2)), (x - int(CELL_WIDTH/2), y), (x + int(CELL_WIDTH/2), y)]:
+            neighbor = self[new_x, new_y]
+            if neighbor is not None:
+                yield neighbor
+
+    def _to_str_matrix(self):
+        """
+        Returns a matrix with a pretty printed visual representation of this
+        maze. Example 5x5:
+        OOOOOOOOOOO
+        O       O O
+        OOO OOO O O
+        O O   O   O
+        O OOO OOO O
+        O   O O   O
+        OOO O O OOO
+        O   O O O O
+        O OOO O O O
+        O     O   O
+        OOOOOOOOOOO
+        """
+        str_matrix = [['O'] * (self.width * 2 + 1)
+                      for i in range(self.height * 2 + 1)]
+
+        for cell in self.cells:
+            x = cell.x * 2 + 1
+            y = cell.y * 2 + 1
+            str_matrix[y][x] = ' '
+            if N not in cell and y > 0:
+                str_matrix[y - 1][x + 0] = ' '
+            if S not in cell and y + 1 < self.width:
+                str_matrix[y + 1][x + 0] = ' '
+            if W not in cell and x > 0:
+                str_matrix[y][x - 1] = ' '
+            if E not in cell and x + 1 < self.width:
+                str_matrix[y][x + 1] = ' '
+
+        return str_matrix
+
+    def randomize(self):
+        """
+        Knocks down random walls to build a random perfect maze.
+        Algorithm from http://mazeworks.com/mazegen/mazetut/index.htm
+        """
+        cell_stack = []
+        cell = random.choice(self.cells)
+        n_visited_cells = 1
+
+        while n_visited_cells < len(self.cells):
+            neighbors = [c for c in self.neighbors(cell) if c.is_full()]
+            if len(neighbors):
+                neighbor = random.choice(neighbors)
+                cell.connect(neighbor)
+                cell_stack.append(cell)
+                cell = neighbor
+                n_visited_cells += 1
+            else:
+                cell = cell_stack.pop()
+
+    def draw(self):
+        for cell in self.cells :
+            cell.draw()
+
+    @staticmethod
+    def generate(surface:Surface, width:int=20, height:int=10):
+        """
+        Returns a new random perfect maze with the given sizes.
+        """
+        m = Maze(surface, width, height)
+        #m.randomize()
+        return m

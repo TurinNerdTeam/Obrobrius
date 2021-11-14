@@ -10,6 +10,7 @@ from pygame.locals import (
 )
 
 from sprites.obry import Obry
+from sprites.maze import Maze
 
 
 # define global values
@@ -22,6 +23,7 @@ SCREEN_HEIGHT = 600
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 obry = Obry(DISPLAYSURF)
+maze = Maze.generate(DISPLAYSURF,SCREEN_WIDTH,SCREEN_HEIGHT)
 
 def events_handler():
     for event in pygame.event.get():
@@ -47,6 +49,7 @@ def main_loop():
         DISPLAYSURF.fill(pygame.Color(0,0,0))
 
         obry.draw()
+        maze.draw()
 
         # update the main window content
         pygame.display.update()
