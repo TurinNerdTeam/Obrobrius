@@ -28,13 +28,13 @@ class Obry(Sprite):
         self.y += y
 
         if self.x < 0:
-            self.x = 0
+            self.x = self.radius
         if self.x > self.surface.get_width():
-            self.x = self.surface.get_width()
-        if self.y <0:
-            self.y = 0
+            self.x = self.surface.get_width() - self.radius
+        if self.y < 0:
+            self.y = self.radius
         if self.y > self.surface.get_height():
-            self.y = self.surface.get_height()
+            self.y = self.surface.get_height() - self.radius
 
         pygame.draw.circle(self.surface, self.color, (self.x,self.y), self.radius, self.width)
 
