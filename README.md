@@ -1,6 +1,6 @@
 # Obrobrius
 
-![oroboros](./img/oroboros.png)
+![oroboros](./docs/images/oroboros.png)
 
 ## Scope
 The scope of this project is to build a 2D videogame inspired by the 2012 Global Game Jame theme, the Ouroboros. The ouroboro's symbol has many meanings according to different cultures but more generally is a circular symbol that depicts a snake or dragon devouring its own tail and that is used especially to represent the eternal cycle of destruction and rebirth. The main goals of the game are:
