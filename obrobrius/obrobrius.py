@@ -12,6 +12,8 @@ from pygame.locals import (
 from sprites.obry import Obry
 from sprites.maze import Maze
 
+from splash_screen import show_splash_screen
+
 
 # define global values
 running = True
@@ -39,6 +41,9 @@ def keyboard_handler():
     obry.update_position(pressed_keys)
 
 def main_loop():
+
+    show_splash_screen(DISPLAYSURF)
+
     global running
     # main loop game
     while running:
