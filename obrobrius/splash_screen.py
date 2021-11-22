@@ -1,54 +1,79 @@
 import pygame
 from pygame import *
-from pygame import Surface
 
-from time import sleep
+from enum import Enum
 
-def show_splash_screen(screen: Surface):
+class ImageState(Enum):
+    FADE_IN = 0
+    SHOW_LOGO = 1
+    FADE_OUT = 2
+
+def show_splash_screen(screen: Surface) -> bool:
     
     game_logo = pygame.image.load('.\game_assets\splash_screen\Logo.png')
     game_logo = pygame.transform.scale(game_logo, (640, 480))
-    
-    x,y = pygame.display.get_surface().get_size()
-    rect = game_logo.get_rect()
-    rect.center = (x / 2. , y / 2.)
 
-    alphaSurface = Surface((1024,768)) # The custom-surface of the size of the screen.
-    alphaSurface.fill((255,255,255)) # Fill it with whole white before the main-loop.
-    alphaSurface.set_alpha(0) # Set alpha to 0 before the main-loop. 
-    alph = 0 # The increment-variable.
-    
+    team_logo = pygame.image.load('.\game_assets\splash_screen\Team_Logo.jpg')
+    team_logo = pygame.transform.scale(team_logo, (640, 480))
+
+    x,y = pygame.display.get_surface().get_size()
+    game_logo_rect = game_logo.get_rect()
+    game_logo_rect.center = (x / 2. , y / 2.)
+
+    team_logo_rect = team_logo.get_rect()
+    team_logo_rect.center = (x / 2. , y / 2.)
+
+    alpha = 0 # The increment-variable.
+      
+    static_image_counter = 0
+    image_state = ImageState.FADE_IN
+    image_num = 1 # Count backward
+
     intro = True
     while intro:
         for event in pygame.event.get():
             if event.type == KEYDOWN:
-                return
+                return True
+            if event.type == QUIT:
+                return False
 
-        alph += 0.1 # Increment alpha by a really small value (To make it slower, try 0.01)
-        game_logo.set_alpha(alph) # Set the incremented alpha-value to the custom surface.
-        screen.blit(game_logo, rect)
-        sleep(0.1)
-        
-        
-        #screen.blit()
+        screen.fill((0,0,0)) # Reset the image
 
-        #screen.fill((0,0,0)) # At each main-loop fill the whole screen with black.
-        #alph += 0.1 # Increment alpha by a really small value (To make it slower, try 0.01)
-        #alphaSurface.set_alpha(alph) # Set the incremented alpha-value to the custom surface.
-        #screen.blit(alphaSurface,(0,0)) # Blit it to the screen-surface (Make them separate)
+        match image_state:
+            case ImageState.FADE_IN:
+                alpha = alpha + 4.25  # 60 fps -> 1s -> 255 / 60 = 4.25 
+                if alpha >= 255: image_state = ImageState.SHOW_LOGO
+            
+            case ImageState.SHOW_LOGO:
+                alpha = 255
+                static_image_counter += 1
+                if static_image_counter >= 120: # 60 fps -> 2s -> 60 * 2 = 120 
+                    static_image_counter = 0
+                    image_state = ImageState.FADE_OUT
 
-        display.flip() # Flip the whole screen at each frame.
+            case ImageState.FADE_OUT:
+                alpha = alpha - 4.25 # 60 fps -> 1s -> 255 / 60 = 4.25 
+                if alpha < 0: 
+                    alpha = 0
+                    image_num -= 1
+                    if (image_num < 0): return True
+                    image_state = ImageState.FADE_IN
+
+
+        match image_num:
+            case 1:
+                game_logo.set_alpha(alpha)
+                screen.blit(game_logo, game_logo_rect)
+            case 0:
+                team_logo.set_alpha(alpha) 
+                screen.blit(team_logo, team_logo_rect)  
+
+
+        pygame.time.Clock().tick(60) #60 fps
+        display.flip() 
     
 
 
-
-    # gamedisplay.fill(WHITE)
-    # largeText = pygame.font.Font('Arial',155)
-    # textSurf, textRect = text_objects("test", largeText)
-    # textRect.centre = ((display_width/2), (display_height/2))
-    # gamedisplay.blit(textSurf, textRect)
-    # pygame.display.update()
-    # clock.tick(15)
 
 
 

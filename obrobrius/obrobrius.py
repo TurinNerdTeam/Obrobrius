@@ -41,10 +41,11 @@ def keyboard_handler():
     obry.update_position(pressed_keys)
 
 def main_loop():
-
-    show_splash_screen(DISPLAYSURF)
-
     global running
+
+    if show_splash_screen(DISPLAYSURF) == False:
+        running = False
+    
     # main loop game
     while running:
         # mange input events
