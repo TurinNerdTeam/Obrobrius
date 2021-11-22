@@ -45,7 +45,7 @@ def main_loop():
 
     if show_splash_screen(DISPLAYSURF) == False:
         running = False
-    
+
     # main loop game
     while running:
         # mange input events
