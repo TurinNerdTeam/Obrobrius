@@ -68,7 +68,8 @@ class Cell(Sprite):
         Returns the direction to the given cell from the current one.
         Must be one cell away only.
         """
-        assert abs(self.x - other.x) + abs(self.y - other.y) == 1, '{}, {}'.format(self, other)
+        #TODO re anble this check
+        #assert abs(self.x - other.x) + abs(self.y - other.y) == 1, '{}, {}'.format(self, other)
         if other.y < self.y:
             return N
         elif other.y > self.y:
@@ -84,8 +85,13 @@ class Cell(Sprite):
         """
         Removes the wall between two adjacent cells.
         """
-        other.walls.remove(other._wall_to(self))
-        self.walls.remove(self._wall_to(other))
+        print(other._wall_to(self))
+        if other._wall_to(self) in other.walls:
+            other.walls.remove(other._wall_to(self))
+
+        print(self._wall_to(other))
+        if self._wall_to(other) in self.walls:
+            self.walls.remove(self._wall_to(other))
 
     def draw(self):
         """
@@ -153,7 +159,11 @@ class Maze(SpriteGroup):
         """
         x, y = index
         if 0 <= x < self.width and 0 <= y < self.height:
-            return self.cells[x + y * self.width]
+            #return self.cells[x + y * self.width]
+            a = int(x / (CELL_WIDTH/2))
+            b = int(y / (CELL_HEIGHT/2))
+            c = int(self.width / CELL_WIDTH)
+            return self.cells[a + b * c]
         else:
             return None
 
@@ -162,8 +172,11 @@ class Maze(SpriteGroup):
         Returns the list of neighboring cells, not counting diagonals. Cells on
         borders or corners may have less than 4 neighbors.
         """
+        print(cell)
+
         x = cell.x
         y = cell.y
+
         for new_x, new_y in [(x, y - int(CELL_HEIGHT/2)), (x, y + int(CELL_HEIGHT/2)), (x - int(CELL_WIDTH/2), y), (x + int(CELL_WIDTH/2), y)]:
             neighbor = self[new_x, new_y]
             if neighbor is not None:
@@ -214,6 +227,9 @@ class Maze(SpriteGroup):
 
         while n_visited_cells < len(self.cells):
             neighbors = [c for c in self.neighbors(cell) if c.is_full()]
+            print(len(neighbors))
+            print(n_visited_cells)
+            print(len(self.cells))
             if len(neighbors):
                 neighbor = random.choice(neighbors)
                 cell.connect(neighbor)
@@ -221,7 +237,8 @@ class Maze(SpriteGroup):
                 cell = neighbor
                 n_visited_cells += 1
             else:
-                cell = cell_stack.pop()
+                if len(cell_stack):
+                    cell = cell_stack.pop()
 
     def draw(self):
         for cell in self.cells :
@@ -233,5 +250,5 @@ class Maze(SpriteGroup):
         Returns a new random perfect maze with the given sizes.
         """
         m = Maze(surface, width, height)
-        #m.randomize()
+        m.randomize()
         return m
