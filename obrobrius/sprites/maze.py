@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 import random
 import pygame
 from pygame.sprite import Sprite
@@ -149,21 +150,23 @@ class Maze(SpriteGroup):
         self.width = width
         self.height = height
         self.cells = []
-        for y in range(int(CELL_HEIGHT/2), int(self.height), int(CELL_HEIGHT/2)):
-            for x in range(int(CELL_WIDTH/2), int(self.width), int(CELL_WIDTH/2)):
-                self.cells.append(Cell(surface, x, y))
+        for y in range(int(self.height/CELL_HEIGHT)):
+            for x in range(int(self.width/CELL_WIDTH)):
+                x_c = int(CELL_WIDTH/2 + x * CELL_WIDTH)
+                y_c = int(CELL_HEIGHT/2 + y * CELL_HEIGHT)
+                self.cells.append(Cell(surface, x_c, y_c))
 
     def __getitem__(self, index):
         """
         Returns the cell at index = (x, y).
         """
-        x, y = index
-        if 0 <= x < self.width and 0 <= y < self.height:
+        x_c, y_c = index
+        if 0 <= x_c < self.width and 0 <= y_c < self.height:
             #return self.cells[x + y * self.width]
-            a = int(x / (CELL_WIDTH/2))
-            b = int(y / (CELL_HEIGHT/2))
-            c = int(self.width / CELL_WIDTH)
-            return self.cells[a + b * c]
+            x = int ((2*x_c - CELL_WIDTH) / (2*CELL_WIDTH))
+            y = int ((2*y_c - CELL_HEIGHT) / (2*CELL_HEIGHT))
+            l = int(self.width/CELL_WIDTH)
+            return self.cells[x + y * l]
         else:
             return None
 
@@ -172,8 +175,6 @@ class Maze(SpriteGroup):
         Returns the list of neighboring cells, not counting diagonals. Cells on
         borders or corners may have less than 4 neighbors.
         """
-        print(cell)
-
         x = cell.x
         y = cell.y
 
@@ -224,21 +225,40 @@ class Maze(SpriteGroup):
         cell_stack = []
         cell = random.choice(self.cells)
         n_visited_cells = 1
+        print(len(self.cells))
 
-        while n_visited_cells < len(self.cells):
-            neighbors = [c for c in self.neighbors(cell) if c.is_full()]
-            print(len(neighbors))
+        #while n_visited_cells < len(self.cells):
+        while n_visited_cells < 20:
+            print("\n====\npassing from: ")
+            print(cell)
+
             print(n_visited_cells)
             print(len(self.cells))
+
+            neighbors = [c for c in self.neighbors(cell) if c.is_full()]
+            print("\t full  neighbors ")
+            print(neighbors)
+
             if len(neighbors):
                 neighbor = random.choice(neighbors)
+                print("\t selected neighbors")
+                print(neighbor)
+
                 cell.connect(neighbor)
+                print("\t cell connected")
+                print(cell)
+                print(neighbor)
+
                 cell_stack.append(cell)
+                print("\t updated cell_stack")
+                print(cell_stack)
+
                 cell = neighbor
                 n_visited_cells += 1
+
             else:
-                if len(cell_stack):
-                    cell = cell_stack.pop()
+                cell = cell_stack.pop()
+
 
     def draw(self):
         for cell in self.cells :
