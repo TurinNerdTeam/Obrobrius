@@ -1,4 +1,4 @@
-# Obrobrius
+# Obrobriuss
 
 ![oroboros](./docs/images/oroboros.png)
 
