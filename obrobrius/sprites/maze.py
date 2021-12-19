@@ -14,10 +14,6 @@ from pygame.draw import line as Line
 # Easy to read representation for each cardinal direction.
 N, S, W, E = ('n', 's', 'w', 'e')
 
-# size of the cell
-CELL_WIDTH = 60
-CELL_HEIGHT = 60
-
 # default colors
 CELL_BORDER_COLOR = Color(188,188,188) # Gray
 CELL_BG_COLOR = Color(0,0,0) # Black
@@ -36,6 +32,8 @@ class Cell(Sprite):
     """
 
     def __init__(self, surface:Surface, x:int, y:int,
+            edge_length:int=10,
+            offset:int=10,
             walls:list=[N, S, E, W],
             line_width:int=CELL_LINE_WIDTH,
             border_color:Color=CELL_BORDER_COLOR,
@@ -43,6 +41,13 @@ class Cell(Sprite):
             ):
         self.x = x
         self.y = y
+        
+        self.egde_length=edge_length
+        self.offset = offset
+
+        self.x_surf = ((self.egde_length/2)+self.x*self.egde_length) + self.offset
+        self.y_surf = ((self.egde_length/2)+self.y*self.egde_length) + self.offset
+
         self.line_width = line_width
         self.rects = []
         self.surface = surface
@@ -52,7 +57,7 @@ class Cell(Sprite):
 
     def __repr__(self):
         # <15, 25 (es  )>
-        return '<{}, {} ({:4})>'.format(self.x, self.y, ''.join(sorted(self.walls)))
+        return '<[{}, {}], [{}, {}] ({:4})>'.format(self.x, self.y, self.x_surf, self.y_surf, ''.join(sorted(self.walls)))
 
     def __contains__(self, item):
         # N in cell
@@ -69,8 +74,7 @@ class Cell(Sprite):
         Returns the direction to the given cell from the current one.
         Must be one cell away only.
         """
-        #TODO re anble this check
-        #assert abs(self.x - other.x) + abs(self.y - other.y) == 1, '{}, {}'.format(self, other)
+        assert abs(self.x - other.x) + abs(self.y - other.y) == 1, '{}, {}'.format(self, other)
         if other.y < self.y:
             return N
         elif other.y > self.y:
@@ -86,11 +90,9 @@ class Cell(Sprite):
         """
         Removes the wall between two adjacent cells.
         """
-        print(other._wall_to(self))
         if other._wall_to(self) in other.walls:
             other.walls.remove(other._wall_to(self))
 
-        print(self._wall_to(other))
         if self._wall_to(other) in self.walls:
             self.walls.remove(self._wall_to(other))
 
@@ -111,16 +113,12 @@ class Cell(Sprite):
             * W wall starts from SE to NE
 
         position (x,y) of the points are calculated using the center of the cell
-            * NE = (self.x + (CELL_WIDTH/2), self.y + (CELL_HEIGHT/2))
-            * NW = (self.x - (CELL_WIDTH/2), self.y + (CELL_HEIGHT/2))
-            * SE = (self.x + (CELL_WIDTH/2), self.y - (CELL_HEIGHT/2))
-            * SW = (self.x - (CELL_WIDTH/2), self.y - (CELL_HEIGHT/2))
         """
 
-        ne = (self.x + (CELL_WIDTH/2), self.y + (CELL_HEIGHT/2))
-        nw = (self.x - (CELL_WIDTH/2), self.y + (CELL_HEIGHT/2))
-        se = (self.x + (CELL_WIDTH/2), self.y - (CELL_HEIGHT/2))
-        sw = (self.x - (CELL_WIDTH/2), self.y - (CELL_HEIGHT/2))
+        ne = (self.x_surf + (self.egde_length/2), self.y_surf + (self.egde_length/2))
+        nw = (self.x_surf - (self.egde_length/2), self.y_surf + (self.egde_length/2))
+        se = (self.x_surf + (self.egde_length/2), self.y_surf - (self.egde_length/2))
+        sw = (self.x_surf - (self.egde_length/2), self.y_surf - (self.egde_length/2))
 
         if self.__contains__(N):
             line = Line(self.surface,self.border_color, nw, ne, self.line_width)
@@ -141,36 +139,31 @@ class Cell(Sprite):
 class Maze(SpriteGroup):
     """
     Maze class containing full board and maze generation algorithms.
+    we assume cells are sqaure
     """
 
-    def __init__(self, surface:Surface, width:int=20, height:int=10):
+    def __init__(self, surface:Surface, width:int=10, height:int=10, cell_edge:int=10, offset:int=10 ):
         """
         Creates a new maze with the given sizes, with all walls standing.
         """
         self.width = width
         self.height = height
         self.cells = []
-        for y in range(int(self.height/CELL_HEIGHT)):
-            for x in range(int(self.width/CELL_WIDTH)):
-                x_c = int(CELL_WIDTH/2 + x * CELL_WIDTH)
-                y_c = int(CELL_HEIGHT/2 + y * CELL_HEIGHT)
-                self.cells.append(Cell(surface, x_c, y_c))
+        for y in range(self.height):
+            for x in range(self.width):
+                self.cells.append(Cell(surface, x, y, cell_edge, offset))
 
-    def __getitem__(self, index):
+    def __getitem__( self, index ):
         """
         Returns the cell at index = (x, y).
         """
-        x_c, y_c = index
-        if 0 <= x_c < self.width and 0 <= y_c < self.height:
-            #return self.cells[x + y * self.width]
-            x = int ((2*x_c - CELL_WIDTH) / (2*CELL_WIDTH))
-            y = int ((2*y_c - CELL_HEIGHT) / (2*CELL_HEIGHT))
-            l = int(self.width/CELL_WIDTH)
-            return self.cells[x + y * l]
+        x, y = index
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return self.cells[x + y * self.width]
         else:
             return None
 
-    def neighbors(self, cell):
+    def neighbors( self, cell ):
         """
         Returns the list of neighboring cells, not counting diagonals. Cells on
         borders or corners may have less than 4 neighbors.
@@ -178,12 +171,12 @@ class Maze(SpriteGroup):
         x = cell.x
         y = cell.y
 
-        for new_x, new_y in [(x, y - int(CELL_HEIGHT/2)), (x, y + int(CELL_HEIGHT/2)), (x - int(CELL_WIDTH/2), y), (x + int(CELL_WIDTH/2), y)]:
+        for new_x, new_y in [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)]:
             neighbor = self[new_x, new_y]
             if neighbor is not None:
                 yield neighbor
 
-    def _to_str_matrix(self):
+    def _to_str_matrix( self ):
         """
         Returns a matrix with a pretty printed visual representation of this
         maze. Example 5x5:
@@ -217,7 +210,7 @@ class Maze(SpriteGroup):
 
         return str_matrix
 
-    def randomize(self):
+    def randomize( self ):
         """
         Knocks down random walls to build a random perfect maze.
         Algorithm from http://mazeworks.com/mazegen/mazetut/index.htm
@@ -225,50 +218,33 @@ class Maze(SpriteGroup):
         cell_stack = []
         cell = random.choice(self.cells)
         n_visited_cells = 1
-        print(len(self.cells))
 
-        #while n_visited_cells < len(self.cells):
-        while n_visited_cells < 20:
-            print("\n====\npassing from: ")
-            print(cell)
-
-            print(n_visited_cells)
-            print(len(self.cells))
-
+        while n_visited_cells < len(self.cells):
             neighbors = [c for c in self.neighbors(cell) if c.is_full()]
-            print("\t full  neighbors ")
-            print(neighbors)
-
             if len(neighbors):
                 neighbor = random.choice(neighbors)
-                print("\t selected neighbors")
-                print(neighbor)
-
                 cell.connect(neighbor)
-                print("\t cell connected")
-                print(cell)
-                print(neighbor)
-
                 cell_stack.append(cell)
-                print("\t updated cell_stack")
-                print(cell_stack)
-
                 cell = neighbor
                 n_visited_cells += 1
-
             else:
                 cell = cell_stack.pop()
 
-
-    def draw(self):
+    def draw( self ):
         for cell in self.cells :
             cell.draw()
 
     @staticmethod
-    def generate(surface:Surface, width:int=20, height:int=10):
+    def generate( surface:Surface, width:int=10, height:int=10, cell_edge:int=10, offset:int=10 ):
         """
         Returns a new random perfect maze with the given sizes.
         """
-        m = Maze(surface, width, height)
+        m = Maze( 
+            surface=surface, 
+            width=width, 
+            height=height, 
+            cell_edge=cell_edge, 
+            offset=offset )
+            
         m.randomize()
         return m
