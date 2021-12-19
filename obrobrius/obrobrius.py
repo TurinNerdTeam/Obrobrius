@@ -21,11 +21,20 @@ FPS = 60
 frames_per_second_monitor = pygame.time.Clock()
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
+CELL_EDGE = 30
+OFFSET = 15
+N_CELL = 19
 
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 obry = Obry(DISPLAYSURF)
-maze = Maze.generate(DISPLAYSURF,SCREEN_WIDTH,SCREEN_HEIGHT)
+maze = Maze.generate(
+    surface=DISPLAYSURF,
+    width=N_CELL,
+    height=N_CELL,
+    cell_edge=CELL_EDGE,
+    offset=OFFSET
+    )
 
 def events_handler():
     for event in pygame.event.get():
