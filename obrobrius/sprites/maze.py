@@ -18,10 +18,29 @@ N, S, W, E = ('n', 's', 'w', 'e')
 CELL_BORDER_COLOR = Color(188,188,188) # Gray
 CELL_BG_COLOR = Color(0,0,0) # Black
 
-# lines width
-CELL_LINE_WIDTH = 1
+class Wall( Sprite ):
+    def __init__( self, surface:Surface, color:Color, start_point, end_point, width:int=1 ):
+        Sprite.__init__(self)
+        self.surface = surface
+        self.color = color
+        self.start_point = start_point
+        self.end_point = end_point
+        self.width = width
+        self.rect = None
 
-class Cell(Sprite):
+    def draw( self ):
+        self.rect = Line(
+            self.surface, 
+            self.color, 
+            self.start_point, 
+            self.end_point, 
+            self.width )
+
+    def __repr__(self):
+        return 'wall <start point : {} , end point {} >'.format(self.start_point, self.end_point)
+
+
+class Cell( SpriteGroup ):
     """
     Class for each individual cell. Knows only its position and which walls are
     still standing.
@@ -35,46 +54,48 @@ class Cell(Sprite):
             edge_length:int=10,
             offset:int=10,
             walls:list=[N, S, E, W],
-            line_width:int=CELL_LINE_WIDTH,
+            line_width:int=1,
             border_color:Color=CELL_BORDER_COLOR,
             bg_color:Color=CELL_BG_COLOR
             ):
+        SpriteGroup.__init__( self )
+
         self.x = x
         self.y = y
         
-        self.egde_length=edge_length
+        self.egde_length = edge_length
         self.offset = offset
 
-        self.x_surf = ((self.egde_length/2)+self.x*self.egde_length) + self.offset
-        self.y_surf = ((self.egde_length/2)+self.y*self.egde_length) + self.offset
+        self.x_surf = ( ( self.egde_length/2 ) + self.x * self.egde_length ) + self.offset
+        self.y_surf = ( ( self.egde_length/2 ) + self.y * self.egde_length ) + self.offset
 
         self.line_width = line_width
         self.rects = []
         self.surface = surface
         self.border_color =  border_color
         self.bg_color =  bg_color
-        self.walls = set(walls)
-
+        self.walls = set( walls )
+        
     def __repr__(self):
         # <15, 25 (es  )>
         return '<[{}, {}], [{}, {}] ({:4})>'.format(self.x, self.y, self.x_surf, self.y_surf, ''.join(sorted(self.walls)))
 
-    def __contains__(self, item):
+    def __contains__( self, item ):
         # N in cell
         return item in self.walls
 
-    def is_full(self):
+    def is_full( self ):
         """
         Returns True if all walls are still standing.
         """
-        return len(self.walls) == 4
+        return len( self.walls ) == 4
 
-    def _wall_to(self, other):
+    def _wall_to( self, other ):
         """
         Returns the direction to the given cell from the current one.
         Must be one cell away only.
         """
-        assert abs(self.x - other.x) + abs(self.y - other.y) == 1, '{}, {}'.format(self, other)
+        assert abs( self.x - other.x ) + abs( self.y - other.y ) == 1, '{}, {}'.format( self, other )
         if other.y < self.y:
             return N
         elif other.y > self.y:
@@ -86,17 +107,17 @@ class Cell(Sprite):
         else:
             assert False
 
-    def connect(self, other):
+    def connect( self, other ):
         """
         Removes the wall between two adjacent cells.
         """
-        if other._wall_to(self) in other.walls:
-            other.walls.remove(other._wall_to(self))
+        if other._wall_to( self ) in other.walls:
+            other.walls.remove( other._wall_to( self ) )
 
-        if self._wall_to(other) in self.walls:
-            self.walls.remove(self._wall_to(other))
+        if self._wall_to( other ) in self.walls:
+            self.walls.remove( self._wall_to( other ) )
 
-    def draw(self):
+    def setup_walls( self ):
         """
         references :
         https://www.pygame.org/docs/ref/draw.html#pygame.draw.lines
@@ -115,28 +136,33 @@ class Cell(Sprite):
         position (x,y) of the points are calculated using the center of the cell
         """
 
-        ne = (self.x_surf + (self.egde_length/2), self.y_surf + (self.egde_length/2))
-        nw = (self.x_surf - (self.egde_length/2), self.y_surf + (self.egde_length/2))
-        se = (self.x_surf + (self.egde_length/2), self.y_surf - (self.egde_length/2))
-        sw = (self.x_surf - (self.egde_length/2), self.y_surf - (self.egde_length/2))
+        ne = ( self.x_surf + ( self.egde_length/2 ), self.y_surf + ( self.egde_length/2 ) )
+        nw = ( self.x_surf - ( self.egde_length/2 ), self.y_surf + ( self.egde_length/2 ) )
+        se = ( self.x_surf + ( self.egde_length/2 ), self.y_surf - ( self.egde_length/2 ) )
+        sw = ( self.x_surf - ( self.egde_length/2 ), self.y_surf - ( self.egde_length/2 ) )
 
         if self.__contains__(N):
-            line = Line(self.surface,self.border_color, nw, ne, self.line_width)
-            self.rects.append(line)
+            line = Wall( self.surface, self.border_color, nw, ne, self.line_width )
+            self.add( line )
 
         if self.__contains__(E):
-            line = Line(self.surface,self.border_color, ne, se, self.line_width)
-            self.rects.append(line)
+            line = Wall( self.surface, self.border_color, ne, se, self.line_width )
+            self.add( line )
 
         if self.__contains__(S):
-            line = Line(self.surface,self.border_color, se, sw, self.line_width)
-            self.rects.append(line)
+            line = Wall( self.surface, self.border_color, se, sw, self.line_width )
+            self.add( line )
 
         if self.__contains__(W):
-            line = Line(self.surface,self.border_color, sw, nw, self.line_width)
-            self.rects.append(line)
+            line = Wall( self.surface, self.border_color, sw, nw, self.line_width )
+            self.add( line )
+        
 
-class Maze(SpriteGroup):
+    def draw(self):
+        for wall in self.sprites():
+            wall.draw()
+
+class Maze():
     """
     Maze class containing full board and maze generation algorithms.
     we assume cells are sqaure
@@ -146,12 +172,14 @@ class Maze(SpriteGroup):
         """
         Creates a new maze with the given sizes, with all walls standing.
         """
+
         self.width = width
         self.height = height
         self.cells = []
         for y in range(self.height):
             for x in range(self.width):
-                self.cells.append(Cell(surface, x, y, cell_edge, offset))
+                cell = Cell(surface, x, y, cell_edge, offset)
+                self.cells.append(cell)
 
     def __getitem__( self, index ):
         """
@@ -230,9 +258,24 @@ class Maze(SpriteGroup):
             else:
                 cell = cell_stack.pop()
 
+        for cell in self.cells :
+            cell.setup_walls()
+
     def draw( self ):
         for cell in self.cells :
             cell.draw()
+            
+    def is_collided(self, player:Sprite) -> bool:
+        collided = False
+
+        for cell in self.cells:
+            tmp = pygame.sprite.spritecollideany(player, cell)
+            if tmp is not None:
+                print(tmp)
+                collided = True
+                break
+
+        return collided
 
     @staticmethod
     def generate( surface:Surface, width:int=10, height:int=10, cell_edge:int=10, offset:int=10 ):
