@@ -7,7 +7,13 @@ from pygame.locals import (
     K_ESCAPE,
     KEYDOWN,
     QUIT,
+    K_UP,
+    K_DOWN,
+    K_LEFT,
+    K_RIGHT,
 )
+
+
 
 from sprites.obry import Obry
 from sprites.maze import Maze
@@ -45,7 +51,44 @@ def events_handler():
 
 def keyboard_handler():
     pressed_keys = pygame.key.get_pressed()
-    obry.update_position(pressed_keys)
+    
+    old_x = obry.x
+    old_y = obry.y
+
+    moved = False
+    if pressed_keys[K_UP]:
+        print("------------")
+        print("premove : ( {}, {} )".format(obry.x, obry.y))
+        moved = True
+        obry.move(0,-5)
+    if pressed_keys[K_DOWN]:
+        print("------------")
+        print("premove : ( {}, {} )".format(obry.x, obry.y))
+        moved = True
+        obry.move(0,5)
+    if pressed_keys[K_LEFT]:
+        print("------------")
+        print("premove : ( {}, {} )".format(obry.x, obry.y))
+        moved = True
+        obry.move(-5,0)
+    if pressed_keys[K_RIGHT]:
+        print("------------")
+        print("premove : ( {}, {} )".format(obry.x, obry.y))
+        moved = True
+        obry.move(5,0)
+    
+
+    if moved :
+        print("postmove : ( {}, {} )".format(obry.x, obry.y))
+
+    if moved and maze.is_collided(obry):
+        x_off = obry.x - old_x
+        y_off = obry.y - old_y
+
+        obry.set_position(old_x,old_y)
+        print("collision : ( {}, {} )".format(obry.x, obry.y))
+
+        print("------------")
 
 def main_loop():
     global running
