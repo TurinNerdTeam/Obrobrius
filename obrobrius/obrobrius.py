@@ -3,6 +3,7 @@
 #
 
 import pygame
+from pygame.color import Color
 from pygame.locals import (
     K_ESCAPE,
     KEYDOWN,
@@ -23,7 +24,7 @@ from splash_screen import show_splash_screen
 
 # define global values
 running = True
-FPS = 60
+FPS = 15
 frames_per_second_monitor = pygame.time.Clock()
 SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
@@ -33,7 +34,7 @@ N_CELL = 19
 
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
-obry = Obry(DISPLAYSURF)
+obry = Obry(DISPLAYSURF, 30, 30)
 maze = Maze.generate(
     surface=DISPLAYSURF,
     width=N_CELL,
@@ -54,43 +55,37 @@ def events_handler():
 def keyboard_handler():
     pressed_keys = pygame.key.get_pressed()
     
-    old_x = obry.x
-    old_y = obry.y
+    x_offset = 0
+    y_offset = 0
+    need2move = False
 
-    moved = False
     if pressed_keys[K_UP]:
-        print("------------")
-        print("premove : ( {}, {} )".format(obry.x, obry.y))
-        moved = True
-        obry.move(0,-5)
+        y_offset = - OFFSET
+        need2move = True
+
     if pressed_keys[K_DOWN]:
-        print("------------")
-        print("premove : ( {}, {} )".format(obry.x, obry.y))
-        moved = True
-        obry.move(0,5)
+        y_offset = OFFSET
+        need2move = True
+
     if pressed_keys[K_LEFT]:
-        print("------------")
-        print("premove : ( {}, {} )".format(obry.x, obry.y))
-        moved = True
-        obry.move(-5,0)
+        x_offset = - OFFSET
+        need2move = True
+
     if pressed_keys[K_RIGHT]:
-        print("------------")
-        print("premove : ( {}, {} )".format(obry.x, obry.y))
-        moved = True
-        obry.move(5,0)
-    
+        x_offset = OFFSET
+        need2move = True
 
-    if moved :
-        print("postmove : ( {}, {} )".format(obry.x, obry.y))
+    if need2move :
+        print("\npre move position: ( {} , {} ) - offsets to apply : ( {} , {} )".format(obry.x,obry.y, x_offset, y_offset))
+        obry.move(x_offset,y_offset)
 
-    if moved and maze.is_collided(obry):
-        x_off = obry.x - old_x
-        y_off = obry.y - old_y
-
-        obry.set_position(old_x,old_y)
-        print("collision : ( {}, {} )".format(obry.x, obry.y))
-
-        print("------------")
+        print("post move : ( {} , {} )- offsets applyed : ( {} , {} )".format(obry.x,obry.y, x_offset, y_offset))
+        if maze.is_collided(obry):
+            x_offset*=-1
+            y_offset*=-1
+            print("post collision  : ( {} , {} ) - offsets to apply : ( {} , {} )".format(obry.x,obry.y, x_offset, y_offset))
+            obry.move(x_offset,y_offset)
+        
 
 def main_loop():
     global running
@@ -104,9 +99,6 @@ def main_loop():
         events_handler()
         keyboard_handler()
 
-        DISPLAYSURF.fill(pygame.Color(0,0,0))
-
-        obry.draw()
         maze.draw()
 
         # update the main window content
@@ -120,5 +112,12 @@ def main_loop():
 if __name__ == "__main__":
     # init paygame
     pygame.init()
+
+    # set background color
+    DISPLAYSURF.fill(pygame.Color(0,0,0))
+
+    # draw the maze
+    maze.draw()
+
     # run main loop
     main_loop()
