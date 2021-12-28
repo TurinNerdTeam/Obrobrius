@@ -2,20 +2,18 @@
 #
 
 import pygame
-from pygame import Color
+from pygame import Color, Surface
 from pygame.sprite import Sprite
 
 class Obry(Sprite):
-    def __init__(self, surface):
+    def __init__(self, surface:Surface, x:int=0, y:int=0, radius:int=5, width:int=2):
         Sprite.__init__(self)
 
-        self.color = Color(255,255,255); # White
         self.surface = surface
-        self.radius = 4
-        self.width = 2
-        #slef.shape = None
-        self.x=300
-        self.y=300
+        self.radius = radius
+        self.width = width
+        self.x=x
+        self.y=y
         self.draw()
         
     def set_position(self, x:int, y:int):
@@ -23,6 +21,7 @@ class Obry(Sprite):
         self.y = y
 
     def move(self, x:int, y:int):
+        self.draw(Color(0,0,0))
         self.x += x
         self.y += y
 
@@ -34,7 +33,9 @@ class Obry(Sprite):
             self.y = self.radius
         if self.y > self.surface.get_height():
             self.y = self.surface.get_height() - self.radius
+        
+        self.draw()
 
-    def draw(self):
-        self.rect = pygame.draw.circle(self.surface, self.color, (self.x,self.y), self.radius, self.width)
+    def draw(self, color:Color = Color(255,255,255)):
+        self.rect = pygame.draw.circle(self.surface, color, (self.x,self.y), self.radius, self.width)
 
