@@ -18,11 +18,8 @@ import random
 from sprites.obry import Obry
 from sprites.maze import Maze
 
-<<<<<<< HEAD
 from splash_screen import show_splash_screen
 
-=======
->>>>>>> c30bb99b213aff5270d4c4d17d88b47b68588658
 # define global values
 running = True
 FPS = 15
