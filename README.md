@@ -23,7 +23,7 @@ Taken by the same adventurous spirit of his grandfather, he decides to stop the 
 
 On the first level, Brave explores the first new world ahead of itself: A semi-deserted forest with sparse vegetation. Everything seems to be perpetrated in this strange calm when suddenly he meets Severus, a treacherous cobra snake who only aims at his interests, to intimidate all animals weaker than him. Venom does not have any items available and as a Pocket Gopher it can not in the least compare to Severus, too strong to fight a duel. Everything seems to take a bad turn when suddenly, he sees different boxex appears in front of him in an apparently random position. Brave goes close to one of themand finds a piece of paper that says:
 
-*Tai sabaki (体捌き)*
+*Tai sabaki (???)*
 
 *Tai sabaki is usually used to avoid an attack, such that the receiver of the attack ends up in an advantageous position and it is often wrongly referred to as evasion. It relates to 'whole body movement', or repositioning. It can be translated as body-management.*
 
