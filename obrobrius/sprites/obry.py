@@ -2,28 +2,26 @@
 #
 
 import pygame
-from pygame import Color
+from pygame import Color, Surface
 from pygame.sprite import Sprite
 
-from pygame.locals import (
-    K_UP,
-    K_DOWN,
-    K_LEFT,
-    K_RIGHT,
-)
-
 class Obry(Sprite):
-    def __init__(self, surface):
-        super().__init__()
-        self.color = Color(255,255,255); # White
+    def __init__(self, surface:Surface, x:int=0, y:int=0, radius:int=5, width:int=2):
+        Sprite.__init__(self)
+
         self.surface = surface
-        self.radius = 5
-        self.width = 5
-        #slef.shape = None
-        self.x=300
-        self.y=300
+        self.radius = radius
+        self.width = width
+        self.x=x
+        self.y=y
+        self.draw()
+        
+    def set_position(self, x:int, y:int):
+        self.x = x
+        self.y = y
 
     def move(self, x:int, y:int):
+        self.draw(Color(0,0,0))
         self.x += x
         self.y += y
 
@@ -35,19 +33,9 @@ class Obry(Sprite):
             self.y = self.radius
         if self.y > self.surface.get_height():
             self.y = self.surface.get_height() - self.radius
+        
+        self.draw()
 
-        pygame.draw.circle(self.surface, self.color, (self.x,self.y), self.radius, self.width)
-
-    def update_position(self, pressed_keys):
-        if pressed_keys[K_UP]:
-            self.move(0,-5)
-        if pressed_keys[K_DOWN]:
-            self.move(0,5)
-        if pressed_keys[K_LEFT]:
-            self.move(-5,0)
-        if pressed_keys[K_RIGHT]:
-            self.move(5,0)
-
-    def draw(self):
-        pygame.draw.circle(self.surface, self.color, (self.x,self.y), self.radius, self.width)
+    def draw(self, color:Color = Color(255,255,255)):
+        self.rect = pygame.draw.circle(self.surface, color, (self.x,self.y), self.radius, self.width)
 
