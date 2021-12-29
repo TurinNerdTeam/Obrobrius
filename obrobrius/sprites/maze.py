@@ -28,13 +28,21 @@ class Wall( Sprite ):
         self.width = width
         self.rect = None
 
-    def draw( self ):
-        self.rect = Line(
-            self.surface, 
-            self.color, 
-            self.start_point, 
-            self.end_point, 
-            self.width )
+    def draw( self, color:Color=None ):
+        if color is not None :
+            self.rect = Line(
+               self.surface, 
+               color, 
+               self.start_point, 
+               self.end_point, 
+               self.width )
+        else:
+            self.rect = Line(
+                self.surface, 
+                self.color, 
+                self.start_point, 
+                self.end_point, 
+                self.width )
 
     def __repr__(self):
         return 'wall <start point : {} , end point {} >'.format(self.start_point, self.end_point)
@@ -63,11 +71,11 @@ class Cell( SpriteGroup ):
         self.x = x
         self.y = y
         
-        self.egde_length = edge_length
+        self.edge_length = edge_length
         self.offset = offset
 
-        self.x_surf = ( ( self.egde_length/2 ) + self.x * self.egde_length ) + self.offset
-        self.y_surf = ( ( self.egde_length/2 ) + self.y * self.egde_length ) + self.offset
+        self.x_surf = ( ( self.edge_length/2 ) + self.x * self.edge_length ) + self.offset
+        self.y_surf = ( ( self.edge_length/2 ) + self.y * self.edge_length ) + self.offset
 
         self.line_width = line_width
         self.rects = []
@@ -141,10 +149,10 @@ class Cell( SpriteGroup ):
         position (x,y) of the points are calculated using the center of the cell
         """
 
-        ne = ( self.x_surf + ( self.egde_length/2 ), self.y_surf + ( self.egde_length/2 ) )
-        nw = ( self.x_surf - ( self.egde_length/2 ), self.y_surf + ( self.egde_length/2 ) )
-        se = ( self.x_surf + ( self.egde_length/2 ), self.y_surf - ( self.egde_length/2 ) )
-        sw = ( self.x_surf - ( self.egde_length/2 ), self.y_surf - ( self.egde_length/2 ) )
+        ne = ( self.x_surf + ( self.edge_length/2 ), self.y_surf + ( self.edge_length/2 ) )
+        nw = ( self.x_surf - ( self.edge_length/2 ), self.y_surf + ( self.edge_length/2 ) )
+        se = ( self.x_surf + ( self.edge_length/2 ), self.y_surf - ( self.edge_length/2 ) )
+        sw = ( self.x_surf - ( self.edge_length/2 ), self.y_surf - ( self.edge_length/2 ) )
 
         if self.__contains__(N):
             line = Wall( self.surface, self.border_color, nw, ne, self.line_width )
@@ -163,8 +171,12 @@ class Cell( SpriteGroup ):
             self.add( line )
 
     def draw(self):
+        #pygame.draw.rect(self.surface, self.bg_color, (self.x_surf - self.edge_length/2 ,self.y_surf - self.edge_length/2, self.x_surf - self.edge_length/2 ,self.y_surf + self.edge_length/2), self.edge_length)
         for wall in self.sprites():
-            wall.draw()
+            wall.draw(self.border_color)
+
+    def set_color(self, color:Color):
+        self.border_color = color
 
     # methods needed for tree representation
 
