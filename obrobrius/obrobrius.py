@@ -76,14 +76,11 @@ def keyboard_handler():
         need2move = True
 
     if need2move :
-        print("\npre move position: ( {} , {} ) - offsets to apply : ( {} , {} )".format(obry.x,obry.y, x_offset, y_offset))
         obry.move(x_offset,y_offset)
 
-        print("post move : ( {} , {} )- offsets applyed : ( {} , {} )".format(obry.x,obry.y, x_offset, y_offset))
         if maze.is_collided(obry):
             x_offset*=-1
             y_offset*=-1
-            print("post collision  : ( {} , {} ) - offsets to apply : ( {} , {} )".format(obry.x,obry.y, x_offset, y_offset))
             obry.move(x_offset,y_offset)
         
 

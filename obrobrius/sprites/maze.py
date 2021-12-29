@@ -5,7 +5,7 @@ import random
 import pygame
 from pygame.sprite import Sprite
 from pygame.sprite import Group as SpriteGroup
-from pygame import Color
+from pygame import Color, register_quit
 from pygame.surface import Surface
 from pygame.draw import line as Line
 
@@ -75,10 +75,15 @@ class Cell( SpriteGroup ):
         self.border_color =  border_color
         self.bg_color =  bg_color
         self.walls = set( walls )
+
+        # stuff needed as tree node
+        self.tree_parent = None
+        self.tree_children = []
         
     def __repr__(self):
-        # <15, 25 (es  )>
-        return '<[{}, {}], [{}, {}] ({:4})>'.format(self.x, self.y, self.x_surf, self.y_surf, ''.join(sorted(self.walls)))
+        #return '<[{}, {}], [{}, {}] ({:4}) -- {} {}>'.format(self.x, self.y, self.x_surf, self.y_surf, ''.join(sorted(self.walls)), self.is_root(), self.get_children_size())
+        #return '<[{}, {}], [{}, {}] ({:4}) -- {} >'.format(self.x, self.y, self.x_surf, self.y_surf, ''.join(sorted(self.walls)), self.is_root(), )
+        return '<[{}, {}] -- {} >'.format(self.x, self.y, self.is_root() )
 
     def __contains__( self, item ):
         # N in cell
@@ -97,9 +102,9 @@ class Cell( SpriteGroup ):
         """
         assert abs( self.x - other.x ) + abs( self.y - other.y ) == 1, '{}, {}'.format( self, other )
         if other.y < self.y:
-            return N
-        elif other.y > self.y:
             return S
+        elif other.y > self.y:
+            return N
         elif other.x < self.x:
             return W
         elif other.x > self.x:
@@ -156,11 +161,39 @@ class Cell( SpriteGroup ):
         if self.__contains__(W):
             line = Wall( self.surface, self.border_color, sw, nw, self.line_width )
             self.add( line )
-        
 
     def draw(self):
         for wall in self.sprites():
             wall.draw()
+
+    # methods needed for tree representation
+
+    def join(self, other):
+        my_root = self.get_root()
+        other_root = other.get_root()
+
+        if my_root != other_root:
+            other_root.tree_parent = self
+            my_root.tree_children.append(other_root)
+
+    def is_root(self):
+        return self.tree_parent is None
+
+    def get_root(self):
+        zip = self
+
+        while zip.tree_parent is not None:
+            zip = zip.tree_parent
+
+        return zip
+
+    def get_children_size(self):
+        c_size = len(self.tree_children)
+
+        for child in self.tree_children:
+            c_size += child.get_children_size()
+
+        return c_size
 
 class Maze():
     """
@@ -199,10 +232,14 @@ class Maze():
         x = cell.x
         y = cell.y
 
+        n_list = []
+
         for new_x, new_y in [(x, y - 1), (x, y + 1), (x - 1, y), (x + 1, y)]:
             neighbor = self[new_x, new_y]
             if neighbor is not None:
-                yield neighbor
+                n_list.append(neighbor)
+
+        return n_list
 
     def _to_str_matrix( self ):
         """
@@ -239,27 +276,30 @@ class Maze():
         return str_matrix
 
     def randomize( self ):
-        """
-        Knocks down random walls to build a random perfect maze.
-        Algorithm from http://mazeworks.com/mazegen/mazetut/index.htm
-        """
-        cell_stack = []
-        cell = random.choice(self.cells)
-        n_visited_cells = 1
+        """ referencel http://weblog.jamisbuck.org/2011/1/3/maze-generation-kruskal-s-algorithm """
 
-        while n_visited_cells < len(self.cells):
-            neighbors = [c for c in self.neighbors(cell) if c.is_full()]
-            if len(neighbors):
-                neighbor = random.choice(neighbors)
-                cell.connect(neighbor)
-                cell_stack.append(cell)
-                cell = neighbor
-                n_visited_cells += 1
-            else:
-                cell = cell_stack.pop()
 
-        for cell in self.cells :
-            cell.setup_walls()
+        cicle = 0
+        n_childrend = 0
+        while n_childrend < len(self.cells) and cicle < 2000 :
+            cell_a = random.choice(self.cells)
+            neighbors = self.neighbors(cell_a)
+            cell_b = random.choice(neighbors)
+
+
+            if len(cell_a.walls) > 2:
+                if len(cell_b.walls) > 1:
+                    root_a = cell_a.get_root()
+                    root_b = cell_b.get_root()
+
+                    if root_a != root_b:
+                        cell_a.join(root_b)
+                        cell_a.connect(cell_b)
+
+                        n_childrend = root_a.get_children_size()
+            
+            cicle +=1
+
 
     def draw( self ):
         for cell in self.cells :
@@ -271,7 +311,6 @@ class Maze():
         for cell in self.cells:
             tmp = pygame.sprite.spritecollideany(player, cell)
             if tmp is not None:
-                print(tmp)
                 collided = True
                 break
 
@@ -290,4 +329,8 @@ class Maze():
             offset=offset )
             
         m.randomize()
+
+        for cell in m.cells :
+            cell.setup_walls()
+
         return m
