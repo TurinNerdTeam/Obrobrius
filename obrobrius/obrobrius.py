@@ -13,14 +13,12 @@ from pygame.locals import (
     K_LEFT,
     K_RIGHT,
 )
-
-
+import random
 
 from sprites.obry import Obry
 from sprites.maze import Maze
 
 from splash_screen import show_splash_screen
-
 
 # define global values
 running = True
@@ -34,6 +32,7 @@ N_CELL = 19
 
 DISPLAYSURF = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
+target_cell = None
 obry = Obry(DISPLAYSURF, 30, 30)
 maze = Maze.generate(
     surface=DISPLAYSURF,
@@ -83,6 +82,12 @@ def keyboard_handler():
             y_offset*=-1
             obry.move(x_offset,y_offset)
         
+def check_finish():
+    global running
+    if obry.x == target_cell.x_surf and obry.y == target_cell.y_surf:
+        running = False
+        print("You won!!!")
+
 
 def main_loop():
     global running
@@ -100,8 +105,11 @@ def main_loop():
 
         # update the main window content
         pygame.display.update()
+
         # tick
         frames_per_second_monitor.tick(FPS)
+
+        check_finish()
 
     # close pygame
     pygame.quit()
@@ -116,5 +124,14 @@ if __name__ == "__main__":
     # draw the maze
     maze.draw()
 
+    start_cell = maze[(0, random.randint(0,N_CELL-1))]
+    target_cell = maze[(N_CELL-1, random.randint(0,N_CELL-1))]
+
+    target_cell.set_color(Color(0,100,100))
+    obry.set_position(start_cell.x_surf, start_cell.y_surf)
+
+    obry.draw()
+
     # run main loop
     main_loop()
+
