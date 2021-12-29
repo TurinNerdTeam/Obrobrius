@@ -46,35 +46,32 @@ def show_splash_screen(screen: Surface) -> bool:
 
         screen.fill((0,0,0)) # Reset the image
 
-        match image_state:
-            case ImageState.FADE_IN:
-                alpha = alpha + 4.25  # 60 fps -> 1s -> 255 / 60 = 4.25 
-                if alpha >= 255: image_state = ImageState.SHOW_LOGO
+        if image_state == ImageState.FADE_IN:
+            alpha = alpha + 4.25  # 60 fps -> 1s -> 255 / 60 = 4.25 
+            if alpha >= 255: image_state = ImageState.SHOW_LOGO
 
-            case ImageState.SHOW_LOGO:
-                alpha = 255
-                static_image_counter += 1
-                if static_image_counter >= 120: # 60 fps -> 2s -> 60 * 2 = 120 
-                    static_image_counter = 0
-                    image_state = ImageState.FADE_OUT
+        elif image_state == ImageState.SHOW_LOGO:
+            alpha = 255
+            static_image_counter += 1
+            if static_image_counter >= 120: # 60 fps -> 2s -> 60 * 2 = 120 
+                static_image_counter = 0
+                image_state = ImageState.FADE_OUT
 
-            case ImageState.FADE_OUT:
-                alpha = alpha - 4.25 # 60 fps -> 1s -> 255 / 60 = 4.25 
-                if alpha < 0:
-                    alpha = 0
-                    image_num -= 1
-                    if (image_num < 0): return True
-                    image_state = ImageState.FADE_IN
+        elif image_state == ImageState.FADE_OUT:
+            alpha = alpha - 4.25 # 60 fps -> 1s -> 255 / 60 = 4.25 
+            if alpha < 0:
+                alpha = 0
+                image_num -= 1
+                if (image_num < 0): return True
+                image_state = ImageState.FADE_IN
 
 
-        match image_num:
-            case 1:
-                game_logo.set_alpha(alpha)
-                screen.blit(game_logo, game_logo_rect)
-            case 0:
-                team_logo.set_alpha(alpha)
-                screen.blit(team_logo, team_logo_rect)
-
+        if image_num == 1:
+            game_logo.set_alpha(alpha)
+            screen.blit(game_logo, game_logo_rect)
+        if image_num == 0:
+            team_logo.set_alpha(alpha)
+            screen.blit(team_logo, team_logo_rect)
 
         pygame.time.Clock().tick(60) #60 fps
         display.flip()
