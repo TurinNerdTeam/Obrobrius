@@ -65,7 +65,7 @@ class Cell( SpriteGroup ):
             line_width:int=1,
             border_color:Color=CELL_BORDER_COLOR,
             bg_color:Color=CELL_BG_COLOR
-            ):
+        ):
         SpriteGroup.__init__( self )
 
         self.x = x

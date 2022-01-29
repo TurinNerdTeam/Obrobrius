@@ -1,6 +1,7 @@
 import pygame
 from pygame import *
 
+from time import sleep
 from enum import Enum
 from os import path
 
@@ -15,8 +16,7 @@ class ImageState(Enum):
     SHOW_LOGO = 1
     FADE_OUT = 2
 
-def show_splash_screen(screen: Surface) -> bool:
-
+def show_start_splash_screen(screen: Surface) -> bool:
     game_logo = pygame.image.load(path.join(current_dir,asset_dir,splash_dir,game_logo_file))
     game_logo = pygame.transform.scale(game_logo, (640, 480))
 
@@ -76,5 +76,15 @@ def show_splash_screen(screen: Surface) -> bool:
         pygame.time.Clock().tick(60) #60 fps
         display.flip()
 
-
-
+def show_end_level_message(screen: Surface) -> bool:
+    screen.fill((0,0,0)) # Reset the image
+    font = pygame.font.SysFont(None, 58)
+    img = font.render('You win!!', True, (0, 0, 255))
+    screen.blit(img, ( (screen.get_height()/2) - img.get_height()/2, (screen.get_width()/2)-img.get_width()/2 ))
+    pygame.time.Clock().tick(60) #60 fps
+    display.flip()
+    sleep(5)
+    screen.fill((0,0,0)) # Reset the image
+    pygame.time.Clock().tick(60) #60 fps
+    display.flip()
+ 

@@ -14,7 +14,6 @@ class Obry(Sprite):
         self.width = width
         self.x=x
         self.y=y
-        self.draw()
         
     def set_position(self, x:int, y:int):
         self.x = x
