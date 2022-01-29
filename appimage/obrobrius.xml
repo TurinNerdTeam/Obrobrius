@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+	<id>tnt.obrobrius.desktop</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0</project_license>
+	<name>obrobrius</name>
+	<summary>A simple Python game, where the user have to solve maze</summary>
+	<description>
+        TODO : ..... 
+	</description>
+	<url type="homepage">https://github.com/TurinNerdTeam/Obrobrius</url>
+	<url type="help">https://github.com/TurinNerdTeam/Obrobrius</url>
+	<url type="bugtracker">https://github.com/TurinNerdTeam/Obrobrius</url>
+	<project_group>tnt</project_group>
+	<developer_name>Stefano Prina</developer_name>
+	<developer_name>Simone Caporale</developer_name>
+	<developer_name>Emanuele Lia</developer_name>
+	<translation type="gettext">mu</translation>
+</component>
