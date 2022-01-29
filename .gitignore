@@ -130,3 +130,7 @@ dmypy.json
 
 # vim swap
 *swp
+
+# appimage stuff
+appimage/out
+appimage/tnt.obrobrius
