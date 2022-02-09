@@ -11,6 +11,8 @@ splash_dir = "splash_screen"
 game_logo_file = "Logo.png"
 team_logo_file = "Team_Logo.jpg"
 
+mp3_audio = 'Obrobrius_Intro.mp3'
+
 class ImageState(Enum):
     FADE_IN = 0
     SHOW_LOGO = 1
@@ -35,6 +37,10 @@ def show_start_splash_screen(screen: Surface) -> bool:
     static_image_counter = 0
     image_state = ImageState.FADE_IN
     image_num = 1 # Count backward
+
+    pygame.mixer.init()
+    pygame.mixer.music.load(path.join(current_dir,asset_dir,splash_dir,mp3_audio))
+    pygame.mixer.music.play()
 
     intro = True
     while intro:
@@ -66,10 +72,10 @@ def show_start_splash_screen(screen: Surface) -> bool:
                 image_state = ImageState.FADE_IN
 
 
-        if image_num == 1:
+        if image_num == 0:
             game_logo.set_alpha(alpha)
             screen.blit(game_logo, game_logo_rect)
-        if image_num == 0:
+        if image_num == 1:
             team_logo.set_alpha(alpha)
             screen.blit(team_logo, team_logo_rect)
 
