@@ -13,6 +13,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+
+      - uses: actions/checkout@v2
+
+      - name: check content
+        run: ls -la
+
       - uses: AppImageCrafters/build-appimage@master
         with:
           recipe: "./appimage/Obrobrius.yml"
