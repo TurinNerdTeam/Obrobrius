@@ -14,12 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v2
+      - name: Checkout Source Code
+        uses: actions/checkout@v2
 
-      - name: check content
+      - name: List folder content
         run: ls -la
 
-      - uses: AppImageCrafters/build-appimage@master
+      - name: Build AppImage
+        uses: AppImageCrafters/build-appimage@master
         with:
           recipe: "./appimage/Obrobrius.yml"
         env:
