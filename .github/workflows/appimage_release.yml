@@ -1,0 +1,19 @@
+name: AutoRelease
+
+# Controls when the action will run. 
+on:
+
+  # Allows you to run this workflow manually from the Actions tab
+  # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#defining-inputs-for-manually-triggered-workflows
+  workflow_dispatch:
+    
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      uses: AppImageCrafters/build-appimage@master
+        with:
+          recipe: "./appimage/Obrobrius.yml"
