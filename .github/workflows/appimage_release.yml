@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: AppImageCrafters/build-appimage@master
-          with:
-            recipe: "./appimage/Obrobrius.yml"
-          env:
-            UPDATE_INFO: gh-releases-zsync|AppImageCrafters|appimage-demo-qt5|latest|*x86_64.AppImage.zsync
+        with:
+          recipe: "./appimage/Obrobrius.yml"
+        env:
+          UPDATE_INFO: gh-releases-zsync|AppImageCrafters|appimage-demo-qt5|latest|*x86_64.AppImage.zsync
