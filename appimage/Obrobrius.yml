@@ -17,16 +17,7 @@ ingredients:
 script:
   - cp -rv ../../../obrobrius  ./usr/
   - cp -rv ../../../game_assets  ./usr/
-  - cat > usr/share/applications/obrobrius.desktop <<\EOF
-  - [Desktop Entry]
-  - Type=Application
-  - Name=Obrobrius
-  - Comment=Where you can solve infinite mazes
-  - Exec=python3 ./obrobrius/obrobrius.py
-  - Icon=tnt.obrobrius
-  - Terminal=false
-  - Categories=Application;Game;
-  - EOF
+  - cp ../../obrobrius.desktop usr/share/applications/obrobrius.desktop 
   - cp usr/share/applications/obrobrius.desktop .
   - cp ../../obrobrius.xml .
   - cp ../../icon.png ./tnt.obrobrius.png

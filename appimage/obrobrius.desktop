@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Obrobrius
+Comment=Where you can solve infinite mazes
+Exec=python3 ./obrobrius/obrobrius.py
+Icon=tnt.obrobrius
+Terminal=false
+Categories=Application;Game;
